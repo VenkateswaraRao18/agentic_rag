@@ -23,4 +23,5 @@ RUN mkdir -p data/index && python -m ingestion.build_index --docs-dir data/docs
 
 EXPOSE 8000
 
-CMD ["uvicorn", "run_api:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# Render provides PORT dynamically; fall back to 8000 for local Docker runs.
+CMD ["sh", "-c", "uvicorn run_api:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips '*'"]
