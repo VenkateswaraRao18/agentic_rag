@@ -1,0 +1,32 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Basic import test
+        run: python -c "from app.main import app; print(app.title)"
+
+  deploy-ec2:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t ops-copilot:${{ github.sha }} .
+      - name: Push and deploy placeholders
+        run: |
+          echo "Add ECR push + SSH/SSM deploy commands here"

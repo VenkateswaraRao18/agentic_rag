@@ -1,0 +1,44 @@
+Synthetic service ownership catalog (demo RAG corpus)
+
+Core commerce
+- payments-api — ops-team — PCI in-scope APIs, checkout and capture paths. Related incidents: INC-1001.
+- orders-db — dba-team — Primary OLTP + read replicas; heavy reporting isolated per AD-HOC-12. Related: INC-1004.
+- inventory-stream — ops-team — Kafka topics inv.* ; consumer lag SLO 5m p95. Related: INC-1008.
+
+Platform and cloud
+- eks-prod-workers — platform-team — Node groups us-east-1 + us-west-2. Related: INC-1015.
+- secrets-staging — platform-team — AWS Secrets Manager rotation Lambdas. Related: INC-1007.
+- s3-assets-bucket — storage-team — Cross-region replication to dr-assets. Related: INC-1021.
+- auth-prehook — identity-team — Lambda@Edge-style pre-auth (internal). Related: INC-1012.
+
+Data and ML
+- data-warehouse — platform-team — Spark / batch; autoscaler limits. Related: INC-1002.
+- snowflake-analytics — data-platform — Reporting warehouses WH_REPORTING_* . Related: INC-1028.
+- airflow-prod — data-platform — DAG nightly_etl and dependencies. Related: INC-1026.
+- es-catalog — search-team — Product catalog index. Related: INC-1009.
+- ocr-worker — ml-platform — Document OCR batch workers. Related: INC-1017.
+
+Observability and release
+- grafana-cloud — observability — Dashboards + silences governance. Related: INC-1014.
+- synthetics-probe — observability — External canaries. Related: INC-1032.
+- deploy-orchestrator — release-engineering — Blue/green gates. Related: INC-1029.
+- gha-runners — developer-productivity — Self-hosted GitHub Actions. Related: INC-1011.
+
+Security and compliance
+- hsm-pool-east — security-team — Signing and key ceremonies. Related: INC-1025.
+- compliance-scanner — security-team — PCI quarterly scans. Related: INC-1019.
+- codesign-pipeline — security-team — Artifact signing keys. Related: INC-1024.
+- public-web — security-team — Marketing CDN origin. Related: INC-1005.
+
+End-user and realtime
+- chat-gateway — realtime-team — WebSocket tier. Related: INC-1027.
+- push-gateway — mobile-platform — APNs/FCM. Related: INC-1006.
+- launchdarkly-relay — platform-team — Feature flags EU cells. Related: INC-1018.
+
+Corporate IT
+- vpn-gateway-eu — corp-it — Split tunnel resolvers. Related: INC-1003.
+- pagerduty-bridge — corp-it — On-call routing. Related: INC-1031.
+
+Finance and edge cases
+- tax-engine — fintech-core — VAT rounding modes; finance sign-off. Related: INC-1023.
+- sendgrid-bridge — messaging-team — SPF/DKIM/DMARC. Related: INC-1016.

@@ -1,0 +1,28 @@
+Synthetic incident response playbook (demo content for RAG evaluation — not production policy)
+
+Severity and paging (illustrative)
+- Sev-1 / customer-impacting: page incident commander + on-call SRE within 5 minutes; exec comms template IC-EXEC-01.
+- Sev-2: page owning team + optional secondary; update status page if external blast radius.
+- Sev-3/4: business hours unless error budget burn exceeds 25% in 1h.
+
+Escalation matrix
+- High priority open incidents (examples from synthetic catalog: INC-1001, INC-1004, INC-1008, INC-1015, INC-1021, INC-1025, INC-1027, INC-1029): war-room optional; post customer-safe updates every 30 minutes until mitigated.
+- Medium (INC-1003, INC-1007, INC-1010, INC-1012, INC-1017, INC-1019, INC-1023, INC-1024, INC-1031): owning team drives; escalate to platform if blast radius crosses two services or CHG linkage appears.
+- Security / compliance (INC-1005, INC-1013, INC-1019, INC-1024, INC-1025): loop in security-team lead; no public post until SEC- review.
+
+Synthetic tickets cross-reference (for citation drills)
+- INC-1001: payments-api — CHG-4821 correlation; checkout 5xx.
+- INC-1004: orders-db replica lag — DBA; throttle analytics per AD-HOC-12.
+- INC-1008: inventory-stream Kafka lag — ops-team; partition strategy before peak.
+- INC-1009: Elasticsearch yellow — search-team; ILM / disk watermarks.
+- INC-1012: auth-prehook Lambda cold start — identity-team; provisioned concurrency.
+- INC-1015: EKS node NotReady us-west-2a — platform; kubelet disk pressure runbook K8S-DISK-01.
+- INC-1018: feature-flag relay EU 503 — platform-team; relay CPU/HPA.
+- INC-1021: S3 cross-region replication lag — storage-team.
+- INC-1025: HSM signing intermittent — security-team; PCI-sensitive handling.
+- INC-1027: chat WebSocket disconnects — realtime-team; LB idle timeout vs heartbeat.
+- INC-1029: deploy orchestrator manual gate — release-engineering; RUNBOOK-REL-04 secondary approver.
+- INC-1031: PagerDuty bridge misroute — corp-it; CHG-4912.
+
+Data hygiene
+When listing or searching incidents, treat the internal catalog snapshot as authoritative for IDs and status fields; combine with retrieved doc evidence for policy interpretation only.

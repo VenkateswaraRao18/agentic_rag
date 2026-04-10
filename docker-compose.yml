@@ -1,0 +1,42 @@
+# Production-style stack: Next.js proxies /api/backend/* to the API (same as local dev).
+# 1) Copy .env.example to .env and set AWS / Bedrock (or use an IAM role on the host).
+# 2) docker compose up --build
+# 3) Open http://localhost:3000
+#
+# For a public HTTPS site, set CORS_ORIGINS to your frontend origin(s) and, if the browser
+# calls the API directly, set NEXT_PUBLIC_API_URL at web build time.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      ENVIRONMENT: production
+      HOST: 0.0.0.0
+      PORT: "8000"
+      # Browser hits Next on :3000; direct /ask from browser would need this origin too.
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_PROXY_TARGET: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
