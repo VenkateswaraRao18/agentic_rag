@@ -133,6 +133,40 @@ def compose_answer_template(
     return "\n".join(lines)
 
 
+def compose_tool_only_answer(question: str, tool_result: dict) -> str:
+    """Deterministic response for ticket/tool queries (fast path, no LLM)."""
+    lines: list[str] = []
+    lines.append(f"Question: {question}")
+    lines.append("")
+    lines.extend(_format_tool_block_template(tool_result))
+    lines.append("")
+    lines.append("Sources: tool only")
+    return "\n".join(lines)
+
+
+def compose_tool_polished_answer(question: str, tool_result: dict) -> str | None:
+    """
+    LLM-polished ticket response that is strictly grounded in tool JSON.
+    Uses no retrieved doc chunks to keep latency lower than full RAG synthesis.
+    """
+    if not settings.use_bedrock:
+        return None
+    payload = (
+        "Answer the question using ONLY the tool JSON below.\n"
+        "Do not invent any fields or incidents.\n"
+        "If count is 0, clearly say no matching incidents were found.\n"
+        "Keep the response concise and factual.\n"
+        "End with: Sources: tool only\n\n"
+        f"Question:\n{question}\n\n"
+        f"Tool JSON:\n{_tool_json(tool_result)}\n"
+    )
+    system = (
+        "You are Ops Copilot. Tool output is authoritative. "
+        "Never contradict or add facts beyond the tool JSON."
+    )
+    return try_bedrock(payload, system_prompt=system)
+
+
 def compose_answer(
     question: str,
     context_docs: list[dict],

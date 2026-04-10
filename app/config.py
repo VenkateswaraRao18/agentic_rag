@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     default_top_k: int = 4
     max_context_chunks: int = 6
     confidence_threshold: float = 0.35
+    # Ticket/tool answer style:
+    # - deterministic: fastest, no LLM rewrite for ticket_lookup tool outputs
+    # - llm_polish: keep tool facts authoritative, but let LLM present the final wording
+    ticket_answer_mode: str = "llm_polish"
 
     model_config = SettingsConfigDict(
         env_file=".env",

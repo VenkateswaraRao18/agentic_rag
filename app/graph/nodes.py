@@ -4,7 +4,7 @@ from typing import Any
 from app.config import settings
 from app.graph.state import AgentState
 from app.services.guardrails import is_blocked_prompt
-from app.services.llm import compose_answer
+from app.services.llm import compose_answer, compose_tool_only_answer, compose_tool_polished_answer
 from app.services.retriever import Retriever
 from app.services.tooling import list_incidents, lookup_ticket, search_incidents
 
@@ -90,6 +90,23 @@ def generate_answer(state: AgentState) -> dict[str, Any]:
         t = maybe_call_tool(state)
         tool_result = t.get("tool_result")
         used_tool = bool(t.get("used_tool"))
+
+    # Ticket/tool path: deterministic by default speed profile, with optional LLM polish.
+    if used_tool and tool_result and state["intent"] == "ticket_lookup":
+        mode = (settings.ticket_answer_mode or "llm_polish").strip().lower()
+        if mode == "llm_polish":
+            polished = compose_tool_polished_answer(state["question"], tool_result)
+            if polished:
+                return {
+                    "answer": polished,
+                    "fallback_used": False,
+                    "citations": [],
+                }
+        return {
+            "answer": compose_tool_only_answer(state["question"], tool_result),
+            "fallback_used": False,
+            "citations": [],
+        }
 
     # Do not gate on RAG similarity alone — it produced false "no trusted evidence" when
     # LangGraph state was incomplete. compose_answer + Bedrock handle thin retrieval.
