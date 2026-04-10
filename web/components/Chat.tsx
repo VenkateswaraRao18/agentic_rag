@@ -81,7 +81,16 @@ export default function Chat() {
         body: JSON.stringify({ question: q }),
       });
       if (!res.ok) {
-        const detail = await res.text();
+        let detail = await res.text();
+        const trimmed = detail.trimStart();
+        if (
+          trimmed.startsWith("<!DOCTYPE") ||
+          trimmed.startsWith("<html") ||
+          (res.status === 502 && detail.includes("Bad Gateway"))
+        ) {
+          detail =
+            `API returned ${res.status} (gateway error). Your Render service may be waking from sleep or restarting — wait a few seconds and try again. If this keeps happening, check Render logs and that BACKEND_PROXY_TARGET on Vercel matches your API URL exactly.`;
+        }
         throw new Error(detail || `HTTP ${res.status}`);
       }
       const data = (await res.json()) as AskResponse;
